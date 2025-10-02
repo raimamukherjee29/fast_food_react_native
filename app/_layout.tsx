@@ -41,10 +41,11 @@ export default Sentry.wrap(function RootLayout() {
     },[fontsLoaded, error]);
 
     useEffect(() => {
-        // Small delay to allow OAuth callback to complete if returning from OAuth
+        // Delay to allow OAuth callback to complete if returning from OAuth
+        // Mobile browsers need more time than desktop
         const timer = setTimeout(() => {
             fetchAuthenticatedUser();
-        }, 500);
+        }, 1000);
         
         return () => clearTimeout(timer);
     }, []);

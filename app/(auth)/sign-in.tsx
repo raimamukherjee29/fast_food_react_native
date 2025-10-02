@@ -27,10 +27,10 @@ const SignIn = () => {
             // Update auth store after successful sign in
             await fetchAuthenticatedUser();
             
-            // Wait a bit for state to propagate
+            // Wait for state to propagate (mobile needs more time)
             setTimeout(() => {
                 router.replace('/');
-            }, 100);
+            }, 500);
         } catch (error: any) {
             Alert.alert('Error', error.message);
             Sentry.captureEvent(error);
@@ -85,8 +85,8 @@ const SignIn = () => {
                 title="Continue with Google"
                 isLoading={isGoogleLoading}
                 onPress={handleGoogleSignIn}
-                style="bg-white border border-gray-300"
-                textStyle="text-black"
+                style="bg-white border-2 border-gray-400 shadow-sm"
+                textStyle="!text-gray-800"
             />
 
             <View className="flex justify-center mt-5 flex-row gap-2">
