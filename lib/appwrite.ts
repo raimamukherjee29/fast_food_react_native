@@ -1,5 +1,5 @@
-import {Account, Avatars, Client, Databases, ID, Query, Storage} from "react-native-appwrite";
-import {CreateUserPrams, GetMenuParams, SignInParams} from "@/type";
+import { CreateUserPrams, GetMenuParams, SignInParams } from "@/type";
+import { Account, Avatars, Client, Databases, ID, Query, Storage } from "react-native-appwrite";
 
 export const appwriteConfig = {
     endpoint: process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT!,
@@ -31,7 +31,7 @@ export const createUser = async ({ email, password, name }: CreateUserPrams) => 
         const newAccount = await account.create(ID.unique(), email, password, name)
         if(!newAccount) throw Error;
 
-        await signIn({ email, password });
+        // account.create() automatically creates a session, no need to sign in again
 
         const avatarUrl = avatars.getInitialsURL(name);
 
