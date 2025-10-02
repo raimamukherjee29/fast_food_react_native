@@ -1,4 +1,5 @@
 import { CreateUserPrams, GetMenuParams, SignInParams } from "@/type";
+import { Linking } from "react-native";
 import { Account, Avatars, Client, Databases, ID, Query, Storage } from "react-native-appwrite";
 
 export const appwriteConfig = {
@@ -77,6 +78,43 @@ export const logout = async () => {
     }
 }
 
+export const signInWithGoogle = async () => {
+    try {
+        // For web, use OAuth2 with redirect
+        // Always use the current origin for proper redirect
+        const redirectUrl = typeof window !== 'undefined' 
+            ? `${window.location.origin}/` 
+            : 'http://localhost:8081/';
+        
+        console.log('Starting Google OAuth with redirect:', redirectUrl);
+        
+        // createOAuth2Session may return a URL on web that we need to manually redirect to
+        const result: any = await account.createOAuth2Session(
+            'google' as any,
+            redirectUrl,
+            redirectUrl,
+        );
+        
+        console.log('OAuth URL created:', result);
+        
+        // Extract the OAuth URL
+        const oauthUrl = typeof result === 'string' ? result : result?.href || result?.toString();
+        console.log('Extracted OAuth URL:', oauthUrl);
+        
+        if (oauthUrl) {
+            console.log('Opening OAuth URL with Linking...');
+            // Use React Native Linking API (works on web, iOS, and Android)
+            await Linking.openURL(oauthUrl);
+            console.log('Redirect initiated!');
+        } else {
+            throw new Error('No OAuth URL returned from Appwrite');
+        }
+    } catch (e) {
+        console.error('Google OAuth error:', e);
+        throw new Error(e as string);
+    }
+}
+
 export const getCurrentUser = async () => {
     try {
         const currentAccount = await account.get();
@@ -88,7 +126,25 @@ export const getCurrentUser = async () => {
             [Query.equal('accountId', currentAccount.$id)]
         )
 
-        if(!currentUser) throw Error;
+        // If user document doesn't exist (e.g., OAuth login), create it
+        if(!currentUser || currentUser.documents.length === 0) {
+            console.log('User document not found, creating for OAuth user...');
+            const avatarUrl = avatars.getInitialsURL(currentAccount.name);
+            
+            const newUser = await databases.createDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.userCollectionId,
+                ID.unique(),
+                { 
+                    email: currentAccount.email, 
+                    name: currentAccount.name, 
+                    accountId: currentAccount.$id, 
+                    avatar: avatarUrl 
+                }
+            );
+            
+            return newUser;
+        }
 
         return currentUser.documents[0];
     } catch (e) {

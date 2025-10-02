@@ -1,6 +1,6 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
-import { createUser } from "@/lib/appwrite";
+import { createUser, signInWithGoogle } from "@/lib/appwrite";
 import useAuthStore from "@/store/auth.store";
 import { Link, router } from "expo-router";
 import React, { useState } from 'react';
@@ -8,6 +8,7 @@ import { Alert, Text, View } from 'react-native';
 
 const SignUp = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [form, setForm] = useState({name: '', email: "", password: ""});
     const { fetchAuthenticatedUser } = useAuthStore();
 
@@ -36,6 +37,18 @@ const SignUp = () => {
             setIsSubmitting(false);
         }
     }
+
+    const handleGoogleSignUp = async () => {
+        setIsGoogleLoading(true);
+        try {
+            await signInWithGoogle();
+            // OAuth will redirect automatically
+        } catch (error: any) {
+            Alert.alert('Error', error.message);
+            setIsGoogleLoading(false);
+        }
+    }
+
     return (
         <View className="gap-10 bg-white rounded-lg p-5 mt-5">
             <CustomInput
@@ -62,6 +75,20 @@ const SignUp = () => {
                 title="Sign Up"
                 isLoading={isSubmitting}
                 onPress={submit}
+            />
+
+            <View className="flex-row items-center gap-3">
+                <View className="flex-1 h-[1px] bg-gray-200" />
+                <Text className="small-regular text-gray-400">OR</Text>
+                <View className="flex-1 h-[1px] bg-gray-200" />
+            </View>
+
+            <CustomButton
+                title="Continue with Google"
+                isLoading={isGoogleLoading}
+                onPress={handleGoogleSignUp}
+                style="bg-white border border-gray-300"
+                textStyle="text-black"
             />
 
             <View className="flex justify-center mt-5 flex-row gap-2">

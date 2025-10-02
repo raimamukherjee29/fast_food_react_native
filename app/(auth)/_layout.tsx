@@ -1,12 +1,8 @@
-import {View, Text, KeyboardAvoidingView, Platform, ScrollView, Dimensions, ImageBackground, Image} from 'react-native'
-import React from 'react'
-import {SafeAreaView} from "react-native-safe-area-context";
-import {Redirect, Slot} from "expo-router";
-import {images} from "@/constants";
-import CustomInput from "@/components/CustomInput";
-import CustomButton from "@/components/CustomButton";
-import {placeholder} from "@babel/types";
+import { images } from "@/constants";
 import useAuthStore from "@/store/auth.store";
+import { Redirect, Slot } from "expo-router";
+import React from 'react';
+import { Dimensions, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 export default function AuthLayout() {
     const { isAuthenticated } = useAuthStore();

@@ -1,9 +1,9 @@
-import {SplashScreen, Stack} from "expo-router";
-import "./globals.css"
-import {useFonts} from "expo-font";
-import {useEffect} from "react";
-import * as Sentry from '@sentry/react-native';
 import useAuthStore from "@/store/auth.store";
+import * as Sentry from '@sentry/react-native';
+import { useFonts } from "expo-font";
+import { SplashScreen, Stack } from "expo-router";
+import { useEffect } from "react";
+import "./globals.css";
 
 Sentry.init({
   dsn: 'https://8eb8a4bd8973799e0a1fbc958833e601@o4510111005147136.ingest.us.sentry.io/4510111006588928',
@@ -41,7 +41,12 @@ export default Sentry.wrap(function RootLayout() {
     },[fontsLoaded, error]);
 
     useEffect(() => {
-        fetchAuthenticatedUser()
+        // Small delay to allow OAuth callback to complete if returning from OAuth
+        const timer = setTimeout(() => {
+            fetchAuthenticatedUser();
+        }, 500);
+        
+        return () => clearTimeout(timer);
     }, []);
 
     if(!fontsLoaded || isLoading) return null;

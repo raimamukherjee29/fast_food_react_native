@@ -1,6 +1,6 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
-import { signIn } from "@/lib/appwrite";
+import { signIn, signInWithGoogle } from "@/lib/appwrite";
 import useAuthStore from "@/store/auth.store";
 import * as Sentry from "@sentry/react-native";
 import { Link, router } from "expo-router";
@@ -9,6 +9,7 @@ import { Alert, Text, View } from 'react-native';
 
 const SignIn = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [form, setForm] = useState({email: "", password: ""});
     const { fetchAuthenticatedUser } = useAuthStore();
 
@@ -37,6 +38,21 @@ const SignIn = () => {
             setIsSubmitting(false);
         }
     }
+
+    const handleGoogleSignIn = async () => {
+        console.log('Google Sign In button clicked');
+        setIsGoogleLoading(true);
+        try {
+            await signInWithGoogle();
+            console.log('OAuth initiated successfully');
+            // OAuth will redirect automatically
+        } catch (error: any) {
+            console.error('Google Sign In error:', error);
+            Alert.alert('Error', error?.message || 'Failed to sign in with Google');
+            setIsGoogleLoading(false);
+        }
+    }
+
     return (
         <View className="gap-10 bg-white rounded-lg p-5 mt-5">
             <CustomInput
@@ -57,6 +73,20 @@ const SignIn = () => {
                 title="Sign In"
                 isLoading={isSubmitting}
                 onPress={submit}
+            />
+
+            <View className="flex-row items-center gap-3">
+                <View className="flex-1 h-[1px] bg-gray-200" />
+                <Text className="small-regular text-gray-400">OR</Text>
+                <View className="flex-1 h-[1px] bg-gray-200" />
+            </View>
+
+            <CustomButton
+                title="Continue with Google"
+                isLoading={isGoogleLoading}
+                onPress={handleGoogleSignIn}
+                style="bg-white border border-gray-300"
+                textStyle="text-black"
             />
 
             <View className="flex justify-center mt-5 flex-row gap-2">
