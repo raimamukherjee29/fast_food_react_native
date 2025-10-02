@@ -28,6 +28,13 @@ export const avatars = new Avatars(client);
 
 export const createUser = async ({ email, password, name }: CreateUserPrams) => {
     try {
+        // Delete any existing session first
+        try {
+            await account.deleteSession('current');
+        } catch (e) {
+            // No active session, continue
+        }
+
         const newAccount = await account.create(ID.unique(), email, password, name)
         if(!newAccount) throw Error;
 
@@ -49,6 +56,13 @@ export const createUser = async ({ email, password, name }: CreateUserPrams) => 
 
 export const signIn = async ({ email, password }: SignInParams) => {
     try {
+        // Delete any existing session first
+        try {
+            await account.deleteSession('current');
+        } catch (e) {
+            // No active session, continue
+        }
+
         const session = await account.createEmailPasswordSession(email, password);
     } catch (e) {
         throw new Error(e as string);
