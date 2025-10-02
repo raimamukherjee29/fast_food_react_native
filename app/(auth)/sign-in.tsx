@@ -26,8 +26,10 @@ const SignIn = () => {
             // Update auth store after successful sign in
             await fetchAuthenticatedUser();
             
-            Alert.alert('Success', 'User signed in successfully');
-            router.replace('/'); //redirect to homepage
+            // Wait a bit for state to propagate
+            setTimeout(() => {
+                router.replace('/');
+            }, 100);
         } catch (error: any) {
             Alert.alert('Error', error.message);
             Sentry.captureEvent(error);

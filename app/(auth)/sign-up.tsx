@@ -26,8 +26,10 @@ const SignUp = () => {
             // Update auth store after successful sign up
             await fetchAuthenticatedUser();
             
-            Alert.alert('Success', 'User signed up successfully');
-            router.replace('/'); //redirect to homepage
+            // Wait a bit for state to propagate
+            setTimeout(() => {
+                router.replace('/');
+            }, 100);
         } catch (error: any) {
             Alert.alert('Error', error.message);
         } finally {
