@@ -1,14 +1,16 @@
-import {View, Text, Button, Alert} from 'react-native'
-import React, {useState} from 'react'
-import {Link, router} from "expo-router";
-import CustomInput from "@/components/CustomInput";
 import CustomButton from "@/components/CustomButton";
-import {createUser, signIn} from "@/lib/appwrite";
+import CustomInput from "@/components/CustomInput";
+import { signIn } from "@/lib/appwrite";
+import useAuthStore from "@/store/auth.store";
 import * as Sentry from "@sentry/react-native";
+import { Link, router } from "expo-router";
+import React, { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
 
 const SignIn = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [form, setForm] = useState({email: "", password: ""});
+    const { fetchAuthenticatedUser } = useAuthStore();
 
     const submit = async () => {
         if (!form.email || !form.password) return Alert.alert('Error',"Please enter a valid email address & password");
@@ -20,6 +22,10 @@ const SignIn = () => {
                 email: form.email,
                 password: form.password,
             })
+            
+            // Update auth store after successful sign in
+            await fetchAuthenticatedUser();
+            
             Alert.alert('Success', 'User signed in successfully');
             router.replace('/'); //redirect to homepage
         } catch (error: any) {
